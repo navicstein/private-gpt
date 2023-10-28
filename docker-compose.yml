@@ -1,0 +1,42 @@
+version: '3.4'
+services:
+  localai:
+    image: quay.io/go-skynet/local-ai:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - 8080:8080
+    environment:
+      - DEBUG=true
+      - CONTEXT_SIZE=700
+      - THREADS=4
+      - PRELOAD_MODELS=[{"url":"github:go-skynet/model-gallery/gpt4all-j.yaml", "name":"gpt-3.5-turbo"}]
+      - MODELS_PATH=/models
+
+    volumes:
+      - ./local/models:/models:cached
+    command: [ "/usr/bin/local-ai" ]
+
+  weaviate:
+    volumes:
+      - ./local/data:/var/lib/
+    image: semitechnologies/weaviate:1.20.3
+    restart: on-failure:0
+    ports:
+      - "8081:8080"
+    environment:
+      QUERY_DEFAULTS_LIMIT: 20
+      AUTHENTICATION_OIDC_ENABLED: 'false'
+      AUTHENTICATION_ANONYMOUS_ACCESS_ENABLED: 'true'
+      PERSISTENCE_DATA_PATH: "./local/weaviate-data"
+      DEFAULT_VECTORIZER_MODULE: text2vec-transformers
+      ENABLE_MODULES: text2vec-transformers
+      TRANSFORMERS_INFERENCE_API: http://t2v-transformers:8080
+      CLUSTER_HOSTNAME: 'node1'
+
+  t2v-transformers:
+    image: semitechnologies/transformers-inference:sentence-transformers-multi-qa-MiniLM-L6-cos-v1
+    environment:
+      ENABLE_CUDA: 0 # set to 1 to enable
+      # NVIDIA_VISIBLE_DEVICES: all # enable if running with CUDA
