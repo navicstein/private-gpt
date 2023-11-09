@@ -2,6 +2,9 @@ package helpers
 
 import (
 	"fmt"
+	"strings"
+	"time"
+
 	"github.com/clarketm/json"
 	"github.com/gomarkdown/markdown"
 	"github.com/gomarkdown/markdown/html"
@@ -10,8 +13,6 @@ import (
 	"github.com/rs/zerolog/log"
 	"golang.org/x/text/cases"
 	"golang.org/x/text/language"
-	"strings"
-	"time"
 )
 
 // MDToHTML converts markdown to html
@@ -52,7 +53,6 @@ func RandFromName(name string, removeWhiteSpace bool) string {
 	caser := cases.Title(language.English)
 	name = fmt.Sprintf("%s%s", caser.String(name), RandName(false))
 
-	// remove spaces?
 	if removeWhiteSpace {
 		name = strings.ReplaceAll(name, " ", "")
 	}

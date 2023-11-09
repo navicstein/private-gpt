@@ -265,14 +265,12 @@
 <script lang="ts" setup>
 import { onMounted, ref } from "vue";
 import moment from "moment";
+import { baseUrl, url } from "../assets/constants";
 
 // TODO: fix me
-const baseUrl = "http://localhost:1337/v1";
-const url = "ws://localhost:1337/v1/chat";
 let socket = new WebSocket(url);
 
 const messages = ref([]);
-const files = ref([]);
 
 const newMessage = ref("");
 
@@ -377,14 +375,9 @@ async function fetchConversations() {
   messages.value = await response.json();
 }
 
-async function fetchFiles() {
-  const response = await fetch(baseUrl + "/documents");
-  files.value = await response.json();
-}
 
 onMounted(() => {
   setupSocket();
   fetchConversations().catch(console.error);
-  fetchFiles().catch(console.error);
 });
 </script>
